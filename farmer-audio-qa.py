@@ -30,11 +30,14 @@ if audio_file and audio_file.name != st.session_state.uploaded_file_name:
     st.info("📤 Uploading audio file to Gemini...")
     myfile = client.files.upload(file=audio_file.name)
 
-    st.info("🔄 Transcribing and translating to English via Gemini...")
+    st.info("🔄 Transcribing in English via Gemini...")
     response = client.models.generate_content(
         model="gemini-2.0-flash-exp",
         contents=[
-            "Please transcribe this farmer interview and translate it to English. Include speaker labels and timestamps. Format it clearly with proper paragraphs.",
+            """Please transcribe this farmer interview directly in English. 
+            If the audio is in another language, provide the English translation as you transcribe.
+            Include speaker labels (e.g., Interviewer:, Farmer:) and timestamps where possible.
+            Format the transcript clearly with proper paragraphs and punctuation.""",
             myfile
         ]
     )
@@ -43,11 +46,11 @@ if audio_file and audio_file.name != st.session_state.uploaded_file_name:
     st.session_state.transcript = response.text
     st.session_state.uploaded_file_name = audio_file.name
     
-    st.success("✅ Transcription and translation complete.")
+    st.success("✅ English transcription complete.")
 
 # Display transcript if available
 if st.session_state.transcript:
-    st.subheader("📝 Transcript (English)")
+    st.subheader("📝 English Transcript")
     
     # Create columns for transcript display and download button
     col1, col2 = st.columns([4, 1])
@@ -60,14 +63,14 @@ if st.session_state.transcript:
     with col2:
         # Download button for transcript
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"transcript_{timestamp}.txt"
+        filename = f"transcript_english_{timestamp}.txt"
         
         st.download_button(
             label="📥 Download Transcript",
             data=st.session_state.transcript,
             file_name=filename,
             mime="text/plain",
-            help="Download the full transcript as a text file"
+            help="Download the full English transcript as a text file"
         )
 
     # Step 2: Q&A
@@ -141,15 +144,16 @@ with st.sidebar:
     st.markdown("### 📖 How to Use")
     st.markdown("""
     1. **Upload Audio**: Upload an MP3 or WAV file of a farmer interview
-    2. **Auto-Transcription**: The audio will be automatically transcribed and translated to English
-    3. **Download**: Download the transcript using the download button
+    2. **Auto-Transcription**: The audio will be automatically transcribed in English
+    3. **Download**: Download the English transcript using the download button
     4. **Ask Questions**: Ask questions about the interview content
     5. **View History**: See all your previous questions and answers
     """)
     
     st.markdown("### ℹ️ Features")
     st.markdown("""
-    - ✅ Automatic English translation
+    - ✅ Direct English transcription
+    - ✅ Automatic translation if audio is in another language
     - ✅ One-time transcription (no re-processing)
     - ✅ Download transcript as text file
     - ✅ Download Q&A history
