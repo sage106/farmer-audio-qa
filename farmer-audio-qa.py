@@ -30,7 +30,12 @@ if audio_file:
 
         # Transcribe using OpenAI Whisper
         with open(tmp_path, "rb") as f:
-            transcript = openai.Audio.transcribe("whisper-1", f)["text"]
+            
+            transcript = openai.audio.transcriptions.create(
+                model="whisper-1",
+                file=f
+            ).text
+
 
         st.session_state.transcript = transcript
         st.success("✅ Transcription complete.")
